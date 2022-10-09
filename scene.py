@@ -68,7 +68,7 @@ def main():
     for x in range(400, scene_width, 100):
         draw_maple_tree(canvas, x, 100, 40)
 
-    draw_church(canvas, 275, 175, 45)
+    draw_church(canvas, 275, 175, 35)
 
     # Call the finish_drawing function
     # in the draw2d.py library.

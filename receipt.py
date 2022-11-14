@@ -1,23 +1,38 @@
 import csv
 
 def main():
-    # Index of the phone number column
-    # in the dentists.csv file.
-    I_NUMBER_INDEX = 0
-    STUDENT_NAME_INDEX = 1
+    PRODUCT_NUMBER_INDEX = 0
+    PRODUCT_NAME_INDEX = 1
+    PRODUCT_PRICE_INDEX = 2
 
-    # Read the contents of the dentists.csv into a
-    # compound dictionary named dentists_dict. Use
-    # the phone numbers as the keys in the dictionary.
-    students_dict = read_dict(".csv", I_NUMBER_INDEX)
+    # Read the contents of the csv file into a dictionary
+    products_dict = read_dict("products.csv", PRODUCT_NUMBER_INDEX)
+    print(products_dict)
+    print()
+    print("Requested Items")
 
-    i_num = input("Please enter your student I-Number: ")
-    student_name = students_dict[i_num][STUDENT_NAME_INDEX]
-    print(f"Student Name: {student_name}")
+    # Index numbers for values in requests.csv
+    PRODUCT_NUMBER = 0
+    QUANTITY = 1
 
+    # Read each line of the csv file
+    with open("request.csv", "rt") as requests_file:
 
-    # Print the dentists compound dictionary.
-    #print(students_dict)
+        reader = csv.reader(requests_file)
+
+        # skip the first row because it's header data
+        next(reader)
+
+        for row_list in reader:
+
+            product_key =  row_list[PRODUCT_NUMBER]
+
+            product_name = products_dict[product_key][PRODUCT_NAME_INDEX]
+            quantity = row_list[QUANTITY]
+            product_price = products_dict[product_key][PRODUCT_PRICE_INDEX]
+
+            
+            print(f"{product_name} {quantity} @ {product_price}")
 
 
 def read_dict(filename, key_column_index):

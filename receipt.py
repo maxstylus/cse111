@@ -1,38 +1,106 @@
 import csv
+from datetime import datetime
+import print_exception
 
 def main():
+
+    STORE_NAME = "Great Value Foods"
+    SALES_TAX_RATE= .06
+    DISCOUNT = .10
+
     PRODUCT_NUMBER_INDEX = 0
     PRODUCT_NAME_INDEX = 1
     PRODUCT_PRICE_INDEX = 2
 
     # Read the contents of the csv file into a dictionary
-    products_dict = read_dict("products.csv", PRODUCT_NUMBER_INDEX)
-    print(products_dict)
-    print()
-    print("Requested Items")
+    try: 
+        products_dict = read_dict("products.csv", PRODUCT_NUMBER_INDEX)
+
+    except FileNotFoundError: 
+        print("FILE NOT FOUND. Please check your filename. ")
+        print()
+        print_exception.PrintException() 
+        print()        
 
     # Index numbers for values in requests.csv
     PRODUCT_NUMBER = 0
     QUANTITY = 1
 
     # Read each line of the csv file
-    with open("request.csv", "rt") as requests_file:
+    try:
+        with open("request.csv", "rt") as requests_file:
 
-        reader = csv.reader(requests_file)
+            reader = csv.reader(requests_file)
 
-        # skip the first row because it's header data
-        next(reader)
+            # skip the first row because it's header data
+            next(reader)
 
-        for row_list in reader:
+            num_items = 0
+            subtotal = 0
+            for row_list in reader:
 
-            product_key =  row_list[PRODUCT_NUMBER]
+                product_key =  row_list[PRODUCT_NUMBER]
 
-            product_name = products_dict[product_key][PRODUCT_NAME_INDEX]
-            quantity = row_list[QUANTITY]
-            product_price = products_dict[product_key][PRODUCT_PRICE_INDEX]
+                try: 
+                    product_name = products_dict[product_key][PRODUCT_NAME_INDEX]
+                    quantity = row_list[QUANTITY]
+                    product_price = products_dict[product_key][PRODUCT_PRICE_INDEX]
+                except KeyError: 
+                    print("********************")
+                    print("Unable to locate the product you are looking for")
+                    print()
+                    print_exception.PrintException() 
+                    print()
+                    print("********************")
 
-            
-            print(f"{product_name} {quantity} @ {product_price}")
+                # count the number of items in the list
+                num_items += int(quantity)
+
+                # The item amount times the quantity
+                item_subtotal = float(product_price) * float(quantity)
+
+                # Add each product and quantity to a subtotal
+                subtotal += item_subtotal
+                
+                print(f"{product_name} {quantity} @ {product_price}")
+
+    except (FileNotFoundError, PermissionError) as err: 
+        print("FILE NOT FOUND. Please check your filename. ")
+        print()
+        print_exception.PrintException() 
+        print()
+
+    # Print receipt 
+    print()
+    print(f"Number of Items: {num_items}")    
+    print(f"Subtotal: {round(subtotal, 2)}")
+
+    # Only if today is Tuesday, add the discount
+    subtotal = check_for_discount(subtotal, DISCOUNT)
+    
+    subtotal = round(subtotal, 2)    
+    sales_tax = round(subtotal * SALES_TAX_RATE, 2)
+    total = round(subtotal + sales_tax, 2)
+
+    print(f"Sales Tax: {sales_tax}")
+    print(f"Total: {total}")
+    print()
+    print(f"Thank you for shopping at {STORE_NAME}.")
+    current_date_and_time = datetime.now()
+    print(f"{current_date_and_time:%a %b %d %I:%M:%S %Y}")
+    print()
+
+
+def check_for_discount(subtotal, discount_rate):
+    discount = 0
+    TUESDAY = 1 
+    if datetime.today().weekday() == TUESDAY:
+        discount = round(subtotal * discount_rate, 2)
+        print(f"Tuesday Discount: {discount}")
+        subtotal = round(subtotal - discount, 2) 
+        print(f"Subtotal with discount applied: {subtotal}")  
+
+    return subtotal 
 
 
 def read_dict(filename, key_column_index):

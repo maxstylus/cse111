@@ -136,7 +136,6 @@ def new_game():
     Label(window, textvariable = lblWord, bg="white", font=("Arial", 25)).grid(column=1, row=1, rowspan=2, sticky=E, padx=10)
     lblWord.set(' '.join("_"*len(chosen_word)))
 
-
 def guess(letter):
     global number_of_guesses
     global chosen_word
@@ -190,7 +189,6 @@ def guess(letter):
             if number_of_guesses == MAX_NUM_GUESSES:
                     messagebox.showwarning("Spelling List Hangman","Sorry. Game Over")
                     window.destroy() 
-
 	
 def close_window(top):
    top.destroy()
